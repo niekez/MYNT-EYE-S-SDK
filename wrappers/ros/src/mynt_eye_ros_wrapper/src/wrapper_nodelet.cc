@@ -35,6 +35,7 @@
 #include <map>
 #include <string>
 
+#include "mynteye/device/utils.h"
 #include "mynteye/logger.h"
 #include "mynteye/api/api.h"
 #include "mynteye/device/context.h"
@@ -209,13 +210,13 @@ class ROSWrapperNodelet : public nodelet::Nodelet {
 
     std::map<Stream, std::string> stream_names{
         {Stream::LEFT, "left"},
-        {Stream::RIGHT, "right"},
-        {Stream::LEFT_RECTIFIED, "left_rect"},
-        {Stream::RIGHT_RECTIFIED, "right_rect"},
-        {Stream::DISPARITY, "disparity"},
-        {Stream::DISPARITY_NORMALIZED, "disparity_norm"},
-        {Stream::DEPTH, "depth"},
-        {Stream::POINTS, "points"}};
+        {Stream::RIGHT, "right"}};
+        // {Stream::LEFT_RECTIFIED, "left_rect"},
+        // {Stream::RIGHT_RECTIFIED, "right_rect"},
+        // {Stream::DISPARITY, "disparity"},
+        // {Stream::DISPARITY_NORMALIZED, "disparity_norm"},
+        // {Stream::DEPTH, "depth"},
+        // {Stream::POINTS, "points"}};
 
     std::map<Stream, std::string> stream_topics{};
     for (auto &&it = stream_names.begin(); it != stream_names.end(); ++it) {
@@ -433,6 +434,10 @@ class ROSWrapperNodelet : public nodelet::Nodelet {
         if (enabled) {
           api_->EnableStreamData(it->first);
           NODELET_INFO_STREAM("Enable stream data of " << it->first);
+        }
+        else
+        {
+          std::cout << "Disabling stream data of " << it->first;
         }
       }
     }
@@ -705,8 +710,10 @@ class ROSWrapperNodelet : public nodelet::Nodelet {
             ++left_count_;
             if (left_count_ > 10) {
               // ros::Time stamp = hardTimeToSoftTime(data.img->timestamp);
+              uint16_t real_exp_time = mynteye::utils::get_real_exposure_time(frame_rate_, data.img->exposure_time);
+
               ros::Time stamp = checkUpTimeStamp(
-                  data.img->timestamp, Stream::LEFT);
+                  data.img->timestamp - real_exp_time*1000, Stream::LEFT);
               if (skip_tag > 0) {
                 if (skip_tmp_left_tag == 0) {
                   skip_tmp_left_tag = skip_tag;
@@ -743,8 +750,9 @@ class ROSWrapperNodelet : public nodelet::Nodelet {
             ++right_count_;
             if (right_count_ > 10) {
               // ros::Time stamp = hardTimeToSoftTime(data.img->timestamp);
+              uint16_t real_exp_time = mynteye::utils::get_real_exposure_time(frame_rate_, data.img->exposure_time);
               ros::Time stamp = checkUpTimeStamp(
-                  data.img->timestamp, Stream::RIGHT);
+                  data.img->timestamp - real_exp_time*1000, Stream::RIGHT);
               if (skip_tag > 0) {
                 if (skip_tmp_right_tag == 0) {
                   skip_tmp_right_tag = skip_tag;

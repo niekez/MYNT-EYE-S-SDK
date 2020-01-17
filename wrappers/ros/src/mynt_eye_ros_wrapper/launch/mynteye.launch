@@ -65,6 +65,13 @@
       <param name="points_topic" value="$(arg points_topic)" />
       <param name="depth_topic" value="$(arg depth_topic)" />
 
+      <param name="enable_left_rect" value="false" />
+      <param name="enable_right_rect" value="false" />
+      <param name="enable_disparity" value="false" />
+      <param name="enable_disparity_norm" value="false" />
+      <param name="enable_points" value="false" />
+      <param name="enable_depth" value="false" />
+
       <param name="left_mono_topic" value="$(arg left_mono_topic)" />
       <param name="right_mono_topic" value="$(arg right_mono_topic)" />
 
